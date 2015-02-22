@@ -1,0 +1,3 @@
+Here, have some foobar text. #MULT(3, 4).
+#define Once Twice upon a time, in a far way land, 
+#define Twice Thrice

@@ -1,0 +1,108 @@
+#define foobar 1
+
+#define MULT(x, y) ((x) * (y))
+#define ADD(a, b) ((a) + (b))
+
+#define complicated_macro(x, y) (Ooohhh yesss y foobar)
+#define INTERIOR_MACRO(x) x \
+  x \
+  x
+
+#define foobar 5 \
+  6
+
+print foobar
+
+MULT(param1, param2)
+MULT(param3, param4)
+
+#include "something.txt"
+#include("a....") // malformed include for robustness
+
+Once upon a macro(dreary), foobar was a cool thing.
+This is a not_macro (not, nope).
+function() { code
+  // line comment
+  more code;
+}
+
+Here, have some  text. MULT(5, 6) .
+Here have some text. MULT(one, two).
+Here have some text MULT(5, 6).
+MULT(5, 6).
+MULT(one, two)
+ MULT(5, 6).
+ MULT(5, 6)
+ MULT(one, two)
+
+This is a complicated_macro((with some interior stuff),
+  (super INTERIOR_MACRO(complicated))).
+
+var array[] = { some stuff, ADD(more, stuff) };
+
+#define morestuff 5
+
+I am building this for OS.
+
+#external echo "HI"
+This should be replaced with a super un-secret message.
+#end
+
+#ifdef OS
+OS is defined.
+#endif
+
+#ifndef OS
+OS is not defined.
+#endif
+
+#ifext txt
+Filetype is txt.
+  #ifdef OS
+  Still on OS.
+  #endif
+#endif
+
+#ifnext txt
+Filetype is not txt.
+#endif
+
+#ifdir bin
+We're in the bin directory.
+#endif
+
+#ifdir g
+We're under g's home directory
+  #ifdef OS
+   on a OS machine.
+  #endif
+#endif
+
+#ifndir bin
+We're not in the bin directory.
+#endif
+
+#ifdir src
+We're in the src directory.
+#endif
+
+#ifndir sers
+This should show up, because 'sers' isn't a proper directory, even though it's a substring of 'Users'.
+#endif
+
+#ifdef TEST_EXTERNAL
+  #external tex2svg
+  \documentclass{article}
+  \usepackage[paperheight=5.0in,paperwidth=8.25in,margin=0in]{geometry}
+  \begin{document}
+
+  \noindent Test Tex.
+
+  \end{document}
+  #end
+#endif
+
+#ifdir Users
+This should show up also.
+#endif
+

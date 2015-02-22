@@ -1,0 +1,6 @@
+.DS_Store
+*.pyc
+foo.txt
+bin/
+dist/
+.pants.d/
