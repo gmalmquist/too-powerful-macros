@@ -1,0 +1,87 @@
+\ProvidesPackage{gmcommon}[2014/02/25 General Macros and Tools]
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{fancyhdr}
+\RequirePackage{listings}
+\RequirePackage{color}
+\RequirePackage{kvoptions}
+\RequirePackage{graphicx}
+\RequirePackage{calc}
+\RequirePackage{enumitem}
+\RequirePackage{setspace}
+\RequirePackage{verbatim}
+\RequirePackage{framed}
+\RequirePackage{epstopdf}
+\RequirePackage{geometry}
+
+\ProcessOptions\relax
+
+\newcommand{\vecxx}[2]{\left( \begin{array}{c} #1 \\ #2 \end{array} \right)}
+\newcommand{\vecxxx}[3]{\left( \begin{array}{c} #1 \\ #2 \\ #3 \end{array} \right)}
+
+\newcommand{\veca}[1]{\left( \begin{array}{c} #1 \end{array} \right)}
+\newcommand{\vecb}[2]{\left( \begin{array}{c} #1 \\ #2 \end{array} \right)}
+\newcommand{\vecc}[3]{\left( \begin{array}{c} #1 \\ #2 \\ #3 \end{array} \right)}
+\newcommand{\vecd}[4]{\left( \begin{array}{c} #1 \\ #2 \\ #3 \\ #4 \end{array} \right)}
+
+\newcommand{\minsec}[1]{\noindent {\scshape \bfseries #1} \noindent}
+\newcommand{\aside}[1]{{\raggedleft{}\noindent *{#1} \\}}
+
+\newcommand{\fb}{$ $\\ \noindent}
+
+\newcommand{\infinity}{\infty}
+
+\newcommand{\Ic}{{\left[\begin{array}{ccc} 1&0&0\\0&1&0\\0&0&1 \end{array}\right]}}
+
+\newcommand{\wvec}{\overrightarrow}
+
+\newcommand{\first}{$1^{st}$ }
+\newcommand{\second}{$2^{nd}$ }
+\newcommand{\third}{$2^{rd}$ }
+\newcommand{\nth}[1]{$#1^{th}$ }
+
+\newcommand{\F}{\infinity}
+\newcommand{\T}{$~~~~$}
+\newcommand{\an}[2]{#1_1, #1_2, ..., #1_#2}
+
+\newenvironment{topcol}[1]{\noindent \begin{minipage}[t]{#1\textwidth}}{\end{minipage}}
+\newenvironment{halfcol}{\begin{topcol}{0.45}}{\end{topcol}}
+
+\newenvironment{proofy}[1]{\begin{framed}{#1 \phantom{$a_{b_c}$}} \hrule{} $ $\vspace{0.1cm}\\}{\end{framed}}
+
+\newenvironment{specs}[2]{\begin{description}[leftmargin=!,labelwidth=\widthof{\bfseries #1}, parsep=#2pt]}{\end{description}}
+
+% \newcommand{\url}[1]{{\it \\ {#1}}}
+
+\newcommand{\nsep}{\vspace{0.1cm}\hrule{}\vspace{0.2cm}}
+
+\newcommand{\ut}[2]{\underset{\text{#2}}{#1}}
+\newcommand{\M}[2]{\underset{#2}{\mathbf #1}}
+\newcommand{\partf}[2]{\frac{\partial #1}{\partial #2}}
+\newenvironment{comp}{\begin{itemize}[parsep=0pt,itemsep=0pt]}{\end{itemize}}
+
+\DeclareMathOperator{\argmax}{argmax}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+\endinput

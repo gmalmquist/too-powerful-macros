@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+
+# This is an example python script to act as
+# an external compiler which converts LaTeX
+# code to SVGs, for easy inclusion in HTML
+# documents.
+#
+# This script assumes a unix architecture
+# and depends on the binaries pdflatex and 
+# pdf2svg, which are easy to acquire via
+# apt-get or brew install if you don't have
+# them already.
+#
+# Invoking it without commandline arguments 
+# simply sends all stdin to pdflatex for
+# compilation.
+#
+# If invoked with 2 commandline arguments, it
+# will assume they are the intended with and
+# height of the document, and will initialize
+# a basic document structure accordingly, 
+# injecting the contents of stdin inside the
+# \begin{document} \end{document} environment.
+
+from subprocess import Popen, PIPE, STDOUT
+
+import os
+import sys
+
+
+def easy_tex_head(width, height):
+  text = '''\\documentclass{article}
+\\usepackage[paperheight='''
+  text += width
+  text += ''',paperwidth='''
+  text += height
+  text += ''',margin=0in]{geometry}
+\\usepackage{gmcommon}
+\\usepackage{tikz}
+\\usetikzlibrary{automata,positioning}
+\\begin{document}
+'''
+  return text 
+
+def easy_tex_tail():
+  return '\n' + '''\\end{document}'''
+
+
+args = sys.argv[1:]
+
+h = file('.temptex.tex', 'w')
+
+head = ''
+tail = ''
+if len(args) >= 2:
+  head = easy_tex_head(args[0], args[1])
+  tail = easy_tex_tail()
+
+s = raw_input()
+h.write(head)
+while s is not None:
+  h.write(s + '\n')
+  try:
+    s = raw_input()
+  except: break
+h.write(tail)
+h.close()
+
+def silent_call(command):
+  com = Popen(command, stdout=PIPE, stderr=STDOUT)
+  stdout, nothing = com.communicate() 
+
+silent_call(['pdflatex', '.temptex.tex'])
+silent_call(['pdf2svg', '.temptex.pdf', '.temptex.svg'])
+
+h = file('.temptex.svg', 'r')
+lines = h.readlines()
+h.close()
+
+for l in lines:
+  if l:
+    print l[:-1]
+
+files = os.listdir('.')
+for f in files:
+  if f.startswith('.temptex.'):
+    os.remove(f)

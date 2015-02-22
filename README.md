@@ -8,6 +8,9 @@ Now, this could all obviously be smoothed over with server-side scripting, but (
 
 This macro processor is "too powerful" because it gives you plenty of rope to hang yourself with if mis-used.
 
+## Performance
+Building a webpage with a couple includes takes about 10 seconds on my machine.
+
 ## Building
 TPM uses pants (https://github.com/pantsbuild/pants) for building. Pants is hermetic, so if you clone TPM you shouldn't have to install anything to get things up and running. 
 
@@ -66,6 +69,17 @@ In addition to the standard symbols, macros, and includes, TPM also supports ext
 #end
 ```
 When TPM sees this block, it make a system call to "cool-program" with the given arguments, and will write anything inside the block (the input) to cool-program's standard input. It then replaces the entire block in the original source file with whatever the standard output of cool-program was. Obviously, this is extremely powerful, and has incredible potentional for both utility and abuse.
+
+An example compiler script can be found at examples/tex2svg, and can be used like so:
+```
+<!-- The below code will generate a LaTeX formatted SVG image. -->
+#external tex2svg 2.0in 2.0in
+\noindent Test LaTeX formatting.
+\begin{align*}
+\text{formula} = \frac{2 \pi r}{x}
+\end{align*}
+#end
+```
 
 ## Processing order
 For efficiency and robustness, TPM processes input code in the following phases:
