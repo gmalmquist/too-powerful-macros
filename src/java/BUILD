@@ -6,6 +6,7 @@ jvm_binary(name='java',
 
 java_library(name='lib',
   sources=rglobs('*.java'),
+  dependencies=['//:antlr-4'],
 )
 
 
