@@ -95,7 +95,7 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
 
     System.out.println("executing " + name + (parts == null ? "" : " with " + Arrays.toString(parts)));
     try {
-      Process p = Runtime.getRuntime().exec(parts, null, new java.io.File(context.filepath).getParentFile());
+      Process p = Runtime.getRuntime().exec(parts, null, new java.io.File(context.outpath).getParentFile());
       InputStream sin = p.getInputStream();
       OutputStream sout = p.getOutputStream();
       PrintStream out = new PrintStream(sout);

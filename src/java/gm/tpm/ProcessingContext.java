@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class ProcessingContext {
   
   public String filepath;
+  public String outpath;
   public Map<String, String> constants;
   public Map<String, MacroDef> macros;
 

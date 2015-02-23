@@ -91,10 +91,10 @@ public class Main {
     for (String source : sources) {
       System.out.println("info: processing " + source);
       String content = "";
-      if (!nowrite)
-        content = FileProcessor.getFileContent(source, options);
-        //content = FileProcessor.getFileContent(source, options);
       String dest = PathTools.moved(".", outdir, source);
+      if (!nowrite)
+        content = FileProcessor.getFileContent(source, dest, options);
+        //content = FileProcessor.getFileContent(source, options);
       System.out.println("info: writing to " + dest);
       if (nowrite) continue;
       try {

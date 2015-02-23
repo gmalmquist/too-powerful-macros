@@ -14,7 +14,7 @@ notExternal
     ;
 
 externalCall
-    : WS? EXTERNAL WS shellCall NEW_LINE externalBlock WS? END
+    : WS? EXTERNAL WS shellCall NEW_LINE WS? externalBlock WS? END WS?
     ;
 
 externalBlock
