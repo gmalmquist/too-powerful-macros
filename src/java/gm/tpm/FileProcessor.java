@@ -17,12 +17,13 @@ import gm.tpm.antlr.*;
 
 public class FileProcessor {
 
-  public static String getFileContent(String path) {
-    return getFileContent(path, new HashMap<String, String>());
+  public static String getFileContent(String path, String dest) {
+    return getFileContent(path, dest, new HashMap<String, String>());
   }
 
-  public static String getFileContent(String path, Map<String, String> options) {
+  public static String getFileContent(String path, String dest, Map<String, String> options) {
     ProcessingContext context = new ProcessingContext(path, options, null);
+    context.outpath = dest;
 
     String content = FileLoader.getFileContent(path);
     content = new DefinitionsProcessor(context).processText(content);
