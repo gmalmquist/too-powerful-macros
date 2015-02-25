@@ -31,11 +31,14 @@ public class FileProcessor {
     context.thingsChanged = true;
     for (int i = 0; context.thingsChanged && i < 10; i++) {
       context.thingsChanged = false;
-      content = new MacroCallsProcessor(context).processText(content);
-      content = new ConstantProcessor(context).processText(content);
+      if (!Main.SKIP.contains("macros"))
+        content = new MacroCallsProcessor(context).processText(content);
+      if (!Main.SKIP.contains("constants"))
+        content = new ConstantProcessor(context).processText(content);
     }
 
-    content = new ExternalProcessor(context).processText(content);
+    if (!Main.SKIP.contains("external") && !Main.SKIP.contains("externals"))
+      content = new ExternalProcessor(context).processText(content);
 
     return content;
   }

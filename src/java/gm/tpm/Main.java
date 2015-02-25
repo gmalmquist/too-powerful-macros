@@ -9,14 +9,18 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Set;
 import java.io.File;
 import java.io.PrintStream;
 
 import gm.tpm.antlr.*;
 
 public class Main {
+
+  public static Set<String> SKIP = new HashSet<>();
 
   public static void main(String[] args) throws Exception {
     if (args.length == 0) {
@@ -77,6 +81,12 @@ public class Main {
         nowrite = true;
     }
 
+    for (CmdArg arg : cmdArgs) {
+      if (arg.is("skip")) {
+        SKIP.add(arg.getValue());
+      }
+    }
+
     File outdirFile = new File(outdir);
     if (!outdirFile.exists()) {
       outdirFile.mkdirs();
@@ -96,6 +106,10 @@ public class Main {
         content = FileProcessor.getFileContent(source, dest, options);
         //content = FileProcessor.getFileContent(source, options);
       System.out.println("info: writing to " + dest);
+      File dp = new File(dest).getParentFile();
+      if (!dp.exists()) {
+        dp.mkdirs();
+      }
       if (nowrite) continue;
       try {
         PrintStream out = new PrintStream(dest);
