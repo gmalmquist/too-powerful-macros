@@ -97,7 +97,12 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
       }
     }
 
-    System.out.println("executing " + name + (parts == null ? "" : " with " + Arrays.toString(parts)));
+    if (Main.SKIP.contains("external-" + name)) {
+      System.out.println("debug: skipping " + name);
+      return "";
+    }
+
+    System.out.println("debug: executing " + name + (parts == null ? "" : " with " + Arrays.toString(parts)));
     try {
       Process p = Runtime.getRuntime().exec(parts, null, new java.io.File(context.outpath).getParentFile());
       InputStream sin = p.getInputStream();
