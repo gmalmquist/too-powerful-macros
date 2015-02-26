@@ -24,12 +24,15 @@ import gm.tpm.antlr.*;
 
 public class ProcessExternalCalls extends ExternalCallsBaseListener {
 
+  private int MAX_THREADS = 8;
+
   private ProcessingContext context;
   private StringBuffer fullText;
   private Set<ParseTree> ignoreSet;
   private ExternalCallsParser parser;
 
-  private Map<ParseTree, String> replacements;
+  private List<ExternalThread> threads;
+  private Map<ParseTree, Object> replacements;
 
   public ProcessExternalCalls(ExternalCallsParser parser, ProcessingContext context) { 
     this.parser = parser; 
@@ -37,6 +40,7 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
     this.context = context;
     this.ignoreSet = new HashSet<>();
     this.replacements = new HashMap<>();
+    this.threads = new LinkedList<>();
   }
 
   @Override
@@ -54,7 +58,7 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
 
   private String getText(ParseTree tree) {
     if (replacements.containsKey(tree)) {
-      return replacements.get(tree);
+      return replacements.get(tree).toString();
     }
     if (tree.getChildCount() == 0) {
       return tree.getText();
@@ -127,13 +131,20 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
     }
   }
 
-
   @Override
   public void exitExternalCall(ExternalCallsParser.ExternalCallContext ctx) {
     String command = ctx.shellCall().getText().trim();
     String block = ctx.externalBlock().getText();
 
-    replacements.put(ctx, makeCall(command, block));
+    ExternalThread thread = new ExternalThread(command, block);
+    threads.add(thread);
+    if (threads.size() > MAX_THREADS) {
+      for (ExternalThread t : threads) {
+        t.toString();
+      }
+      threads.clear();
+    }
+    replacements.put(ctx, thread);
   }
 
   @Override
@@ -144,7 +155,7 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
   @Override
   public void exitEveryRule(ParserRuleContext ctx) {
     // Collapse the stack to reduce recursion needed.
-    replacements.put(ctx, getText(ctx));
+    // replacements.put(ctx, getText(ctx));
   }
 
   @Override
@@ -156,6 +167,31 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
   @Override
   public void visitTerminal(TerminalNode ctx) {
 
+  }
+
+
+  class ExternalThread {
+    private Thread thread;
+    private String result;
+
+    public ExternalThread(final String command, final String block) {
+      thread = new Thread(new Runnable() {
+        public void run() {
+          result = makeCall(command, block);
+        }
+      });
+      result = "[not finished]";
+      thread.start();
+    }
+
+    @Override
+    public String toString() {
+      if (thread.isAlive()) {
+        try { thread.join(); }
+        catch (InterruptedException ex) {}
+      }
+      return result;
+    }
   }
 
 }
