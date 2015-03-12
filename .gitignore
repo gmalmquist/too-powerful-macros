@@ -4,3 +4,4 @@ foo.txt
 bin/
 dist/
 .pants.d/
+pants.pex
