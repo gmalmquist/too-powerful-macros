@@ -102,6 +102,16 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
       return "";
     }
 
+    String cacheCode = call + "\n" + input;
+    if (ExternalCache.hasCache(cacheCode)) {
+      System.out.println("debug: loading " + name + " from cache.");
+      String data = ExternalCache.getCacheData(cacheCode);
+      if (data != null) {
+        return data;
+      }
+    }
+
+
     System.out.println("debug: executing " + name + (parts == null ? "" : " with " + Arrays.toString(parts)));
     try {
       Process p = Runtime.getRuntime().exec(parts, null, new java.io.File(context.outpath).getParentFile());
@@ -129,7 +139,10 @@ public class ProcessExternalCalls extends ExternalCallsBaseListener {
         }
       }
       try { in.close(); } catch (Exception x) {}
-      return sb.toString();
+
+      String result = sb.toString();
+      ExternalCache.setCacheData(cacheCode, result);
+      return result;
     } catch (Exception x) {
       System.err.println("Error running command: " + x);
       return "Compiler error: " + String.valueOf(x);

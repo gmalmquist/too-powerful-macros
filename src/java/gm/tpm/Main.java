@@ -21,6 +21,7 @@ import gm.tpm.antlr.*;
 public class Main {
 
   public static Set<String> SKIP = new HashSet<>();
+  public static Set<String> FLAGS = new HashSet<>();
 
   public static void main(String[] args) throws Exception {
     if (args.length == 0) {
@@ -66,6 +67,12 @@ public class Main {
     if (sources.isEmpty()) {
       System.out.println("No sources specified.\n");
       return;
+    }
+
+    for (CmdArg arg : cmdArgs) {
+      if (arg.getValue().equals("1")) {
+        FLAGS.add(arg.getName().toLowerCase());
+      }
     }
 
     String outdir = "bin";
