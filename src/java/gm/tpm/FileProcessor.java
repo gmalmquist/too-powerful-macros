@@ -38,7 +38,10 @@ public class FileProcessor {
     }
 
     if (!Main.SKIP.contains("external") && !Main.SKIP.contains("externals"))
-      content = new ExternalProcessor(context).processText(content);
+      content = new ExternalProcessor().processFile(context, content);
+
+    if (!Main.SKIP.contains("plugins"))
+      content = PluginProcessor.getInstance().processFile(context, content);
 
     return content;
   }
