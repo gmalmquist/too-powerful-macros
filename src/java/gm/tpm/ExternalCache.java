@@ -13,23 +13,18 @@ import java.math.BigInteger;
  */
 public class ExternalCache {
 
-  private static ExternalCache instance;
-
-  public static ExternalCache getInstance() {
-    if (instance == null) {
-      instance = new ExternalCache();
-    }
-    return instance;
-  }
-
-  private File cacheDir;
+  private static File cacheDir = new File(System.getProperty("user.home") + File.separator + ".tpm-cache");
 
   private ExternalCache() {
-    cacheDir = new File(System.getProperty("user.home") + File.separator + ".tpm-cache");
   }
 
   public static String getCachePath(String externalCall) {
-    return cacheDir + File.separator + String.format("%x", new BigInteger(1, arg.getBytes(externalCall))) + ".extcall";
+    try {
+      return cacheDir + File.separator + String.format("%x", new BigInteger(1, externalCall.getBytes("UTF-8"))) + ".extcall";
+    } catch (Exception ex) {
+      System.err.println(ex);
+      return null;
+    }
   }
 
   public static boolean hasCache(String externalCall) {
