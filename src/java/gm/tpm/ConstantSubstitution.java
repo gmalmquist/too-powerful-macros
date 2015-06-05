@@ -28,6 +28,8 @@ public class ConstantSubstitution extends ConstantRefsBaseListener {
     this.fullText = new StringBuffer(512);
     this.context = context;
     this.ignoreSet = new HashSet<>();
+    
+    this.context.constants.put("FILE", context.filepath);
   }
 
   @Override

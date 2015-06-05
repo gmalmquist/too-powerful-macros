@@ -21,6 +21,7 @@ import gm.tpm.antlr.*;
 public class Main {
 
   public static Set<String> SKIP = new HashSet<>();
+  public static Set<String> FLAGS = new HashSet<>();
 
   public static void main(String[] args) throws Exception {
     if (args.length == 0) {
@@ -36,6 +37,7 @@ public class Main {
 
     String prevArg = null;
     for (String s : args) {
+      //System.out.println("[" + s + "]");
       if (s.toLowerCase().matches("^[-][-]?d.+")) {
         int pos = s.toLowerCase().indexOf('d');
         s = s.substring(pos+1);
@@ -46,7 +48,8 @@ public class Main {
           options.put(s, "1");
         }
       } else {
-        boolean isFlag = s.startsWith("-");
+        boolean isFlag = s.length() > 0 && s.charAt(0) == '-';
+        //System.out.println("  prev=" + prevArg + ", isFlag=" + isFlag);
         if (prevArg != null) {
           if (isFlag) {
             cmdArgs.add(new CmdArg(prevArg, "1"));
@@ -63,10 +66,34 @@ public class Main {
       }
     }
 
+    if (prevArg != null) {
+      cmdArgs.add(new CmdArg(prevArg, "1"));
+    }
+
     if (sources.isEmpty()) {
       System.out.println("No sources specified.\n");
       return;
     }
+
+    for (String s : options.keySet()) {
+      if (options.get(s).equals("1")) {
+        FLAGS.add(s.toLowerCase());
+        System.out.println("flag: " + s.toLowerCase());
+      }
+    }
+
+    for (CmdArg arg : cmdArgs) {
+      System.out.println(arg.getName() + ": " + arg.getValue());
+      if (arg.getValue().equals("1")) {
+        FLAGS.add(arg.getName().toLowerCase());
+      }
+    }
+
+    System.out.print("Flags: [");
+    for (String s : FLAGS) {
+      System.out.print(" " + s);
+    }
+    System.out.println(" ]");
 
     String outdir = "bin";
     for (CmdArg arg : cmdArgs) {
@@ -120,6 +147,12 @@ public class Main {
         System.err.println(" error writing output: " + ex);
       }
     }
+
+    for (AbstractBlockProcessor processor : AbstractBlockProcessor.BLOCK_PROCESSORS) {
+      System.out.println("debug: finishing " + processor.getClass().getSimpleName());
+      processor.finish();
+    }
+
   }
 
 }
