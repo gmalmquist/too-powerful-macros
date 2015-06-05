@@ -94,8 +94,6 @@ Steps 3 and 4 are run repeatedly until no changes are made, thus supporting recu
 ## TODO
 - Allow commandline specified recursion limit.
 - Suppress all the debug messages polluting STDOUT unless a -verbose option is specified.
-- Allow users to skip certain steps (eg, external calls) if they don't need them, to save time.
-- Handle includes more efficiently.
 - Clean up and document all the code.
 
 ## FAQ
