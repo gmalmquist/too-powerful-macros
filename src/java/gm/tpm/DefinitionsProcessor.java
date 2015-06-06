@@ -6,13 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import gm.tpm.antlr.*;
 
-public class DefinitionsProcessor extends Processor<ProcDefinitionsLexer,ProcDefinitionsParser,ProcessDefinitions> {
-
-  private ProcessingContext context;
-
-  public DefinitionsProcessor(ProcessingContext context) {
-    this.context = context;
-  }
+public class DefinitionsProcessor extends ParserFileProcessor<ProcDefinitionsLexer,ProcDefinitionsParser,ProcessDefinitions> {
 
   public ProcDefinitionsLexer createLexer(CharStream input) {
     return new ProcDefinitionsLexer(input);
@@ -23,11 +17,15 @@ public class DefinitionsProcessor extends Processor<ProcDefinitionsLexer,ProcDef
   }
 
   public ProcessDefinitions createListener(ProcDefinitionsParser parser) {
-    return new ProcessDefinitions(parser, context);
+    return new ProcessDefinitions(parser, getContext());
   }
 
   public ParserRuleContext getRoot(ProcDefinitionsParser parser) {
     return parser.file();
+  }
+
+  public String getName() {
+    return "definition";
   }
 
 }

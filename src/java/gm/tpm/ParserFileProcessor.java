@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-public abstract class Processor<X extends Lexer, P extends Parser, T extends ParseTreeListener> {
+public abstract class ParserFileProcessor<X extends Lexer, P extends Parser, T extends ParseTreeListener> implements AbstractFileProcessor {
 
   public abstract X createLexer(CharStream input);
 
@@ -27,8 +27,19 @@ public abstract class Processor<X extends Lexer, P extends Parser, T extends Par
 
   public abstract ParserRuleContext getRoot(P parser);
 
+  private ProcessingContext context;
+
   private String name() {
     return getClass().getSimpleName();
+  }
+
+  protected ProcessingContext getContext() {
+    return context;
+  }
+
+  public String processFile(ProcessingContext context, String content) {
+    this.context = context;
+    return processText(content);
   }
 
   public String processFile(String path) {

@@ -1,5 +1,6 @@
 package gm.tpm;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -63,13 +64,34 @@ public class ExternalProcessor extends AbstractBlockProcessor {
 
     System.out.println("debug: executing " + name + (parts == null ? "" : " with " + Arrays.toString(parts)));
     try {
-      Process p = Runtime.getRuntime().exec(parts, null, new java.io.File(context.outpath).getParentFile());
+      File cwd = new File(context.outpath).getParentFile();
+      System.out.println("       cwd is " + cwd);
+      Process p = Runtime.getRuntime().exec(parts, null, cwd);
       InputStream sin = p.getInputStream();
+      final InputStream serr = p.getErrorStream();
       OutputStream sout = p.getOutputStream();
       PrintStream out = new PrintStream(sout);
       out.print(input);
       out.flush();
       out.close();
+
+      new Thread(new Runnable() {
+        public void run() {
+          try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(serr));
+            while (true) {
+              try {
+                String line = in.readLine();
+                if (line == null) break;
+                System.err.println("[ERROR] " + line);
+              } catch (Exception ex) {
+                break;
+              }
+            }
+          } catch (Exception ex) {}
+        }
+      }).start();
+
       BufferedReader in = new BufferedReader(new InputStreamReader(sin));
       try {
         int exit = p.waitFor();

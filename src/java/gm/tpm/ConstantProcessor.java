@@ -6,13 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import gm.tpm.antlr.*;
 
-public class ConstantProcessor extends Processor<ConstantRefsLexer,ConstantRefsParser,ConstantSubstitution> {
-
-  private ProcessingContext context;
-
-  public ConstantProcessor(ProcessingContext context) {
-    this.context = context;
-  }
+public class ConstantProcessor extends ParserFileProcessor<ConstantRefsLexer,ConstantRefsParser,ConstantSubstitution> {
 
   public ConstantRefsLexer createLexer(CharStream input) {
     return new ConstantRefsLexer(input);
@@ -23,11 +17,14 @@ public class ConstantProcessor extends Processor<ConstantRefsLexer,ConstantRefsP
   }
 
   public ConstantSubstitution createListener(ConstantRefsParser parser) {
-    return new ConstantSubstitution(parser, context);
+    return new ConstantSubstitution(parser, getContext());
   }
 
   public ParserRuleContext getRoot(ConstantRefsParser parser) {
     return parser.file();
   }
 
+  public String getName() {
+    return "constant";
+  }
 }

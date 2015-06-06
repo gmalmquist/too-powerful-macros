@@ -95,16 +95,16 @@ public class LaTeX {
       log("generating latex file.");
       String texname = "temp-latex-file";
       File texfile = new File(texname + ".tex");
-      PrintStream out = new PrintStream(texfile);
-      out.println("\\documentclass{minimal}");
-      out.println("\\usepackage{amsmath}");
-      out.println("\\usepackage{amssymb}");
-      out.println("\\makeatletter");
-      out.println("\\DeclareRobustCommand*\\cal{\\@fontswitch\\relax\\mathcal}");
-      out.println("\\makeatletter");
-      out.println("\\pagestyle{empty}");
-      out.println("\\newcommand{\\lt}{<}");
-      out.println("\\newcommand{\\gt}{>}");
+      StringBuffer sb = new StringBuffer(512);
+      sb.append("\\documentclass{minimal}"+"\n");
+      sb.append("\\usepackage{amsmath}"+"\n");
+      sb.append("\\usepackage{amssymb}"+"\n");
+      sb.append("\\makeatletter"+"\n");
+      sb.append("\\DeclareRobustCommand*\\cal{\\@fontswitch\\relax\\mathcal}"+"\n");
+      sb.append("\\makeatletter"+"\n");
+      sb.append("\\pagestyle{empty}"+"\n");
+      sb.append("\\newcommand{\\lt}{<}"+"\n");
+      sb.append("\\newcommand{\\gt}{>}"+"\n");
       List<String> preamble = new LinkedList<>();
       String ptag = "%PREAMBLE ";
       String nltag = "%NL";
@@ -127,66 +127,101 @@ public class LaTeX {
           }
         }
         if (any) {
-          StringBuffer sb = new StringBuffer(code.length());
+          StringBuffer ss = new StringBuffer(code.length());
           for (String line : lines) {
             if (line == null) continue;
-            if (sb.length() > 0) sb.append("\n");
-            sb.append(line);
+            if (ss.length() > 0) ss.append("\n");
+            ss.append(line);
           }
-          codes.set(ci, sb.toString());
+          codes.set(ci, ss.toString());
         }
       }
       for (String s : preamble)
-        out.println(s);
-      out.println("\\begin{document}");
+        sb.append(s+"\n");
+      sb.append("\\begin{document}"+"\n");
       boolean first = true;
       for (String code : codes) {
         if (first) {
           first = false;
         } else {
-          out.println("\\newpage");
+          sb.append("\\newpage"+"\n");
         }
-        out.println(code);
+        sb.append(code+"\n");
       }
-      out.println("\\end{document}");
+
+      // Just for cache invalidation.
+      sb.append("\n% ");
+      sb.append(density);
+      sb.append(":");
+      sb.append(imageIndex);
+      sb.append(":");
+      sb.append(latexIndex);
+      sb.append("\n");
+
+      sb.append("\\end{document}"+"\n");
+
+      PrintStream out = new PrintStream(texfile);
+      out.print(sb.toString());
       out.close();
 
-      log("pdflatex (" + codes.size() + " images)");
-      Process pdflatex = Runtime.getRuntime().exec(new String[] {
-        "pdflatex", texfile.getName(),
-      });
-      if (readStream(pdflatex)) {
-        log("pdfcrop");
-        Runtime.getRuntime().exec(new String[] {
-          "pdfcrop", texname + ".pdf",
-        }).waitFor();
-
-        log("convert (density=" + density + ")");
-        Runtime.getRuntime().exec(new String[] {
-          "convert", "-density", density, texname + "-crop.pdf", "-quality", "90", texname + ".png"
-        }).waitFor();
-
-        log("moving output images");
-        int index = -1;
+      String hash = PluginCache.sha1(sb.toString());
+      if (PluginCache.hasEntry(LaTeX.class, hash)) {
+        log("loading latex images from cache ...");
+        File[] files = PluginCache.getFiles(LaTeX.class, hash);
+        if (files.length != folders.size()) {
+          log("Requested " + folders.size() + ", got " + files.length + ".");
+        }
+        int ci = 0;
         for (String folder : folders) {
-          index++;
           latexIndex++;
-          String srcPath = String.format("%s%s.png", texname, folders.size() > 1 ? "-" + index : "");
-          String dstPath = folder + File.separator + "LaTeX-image-" + latexIndex + ".png";
-          File srcFile = new File(srcPath);
-          File dstFile = new File(dstPath);
-
-          if (!dstFile.getParentFile().exists()) {
-            dstFile.getParentFile().mkdirs();
+          File dst = new File(folder + File.separator + "LaTeX-image-" + latexIndex + ".png");
+          log("  " + dst.getName());
+          if (!dst.getParentFile().exists()) {
+            dst.getParentFile().mkdirs();
           }
+          PluginCache.copy(files[ci++], dst);
+        }
+      } else {
+        log("pdflatex (" + codes.size() + " images)");
+        Process pdflatex = Runtime.getRuntime().exec(new String[] {
+          "pdflatex", texfile.getName(),
+        });
+        if (readStream(pdflatex)) {
+          log("pdfcrop");
+          Runtime.getRuntime().exec(new String[] {
+            "pdfcrop", texname + ".pdf",
+          }).waitFor();
 
-          if (srcFile.exists()) {
-            if (dstFile.exists())
-              dstFile.delete();
-            Files.move(srcFile.toPath(), dstFile.toPath());
-          } else {
-            System.err.println("Src file " + srcFile + " does not exist!");
+          log("convert (density=" + density + ")");
+          Runtime.getRuntime().exec(new String[] {
+            "convert", "-density", density, texname + "-crop.pdf", "-quality", "90", texname + ".png"
+          }).waitFor();
+
+          File[] results = new File[folders.size()];
+          log("moving output images");
+          int index = -1;
+          for (String folder : folders) {
+            index++;
+            latexIndex++;
+            String srcPath = String.format("%s%s.png", texname, folders.size() > 1 ? "-" + index : "");
+            String dstPath = folder + File.separator + "LaTeX-image-" + latexIndex + ".png";
+            File srcFile = new File(srcPath);
+            File dstFile = new File(dstPath);
+            results[index] = dstFile;
+
+            if (!dstFile.getParentFile().exists()) {
+              dstFile.getParentFile().mkdirs();
+            }
+
+            if (srcFile.exists()) {
+              if (dstFile.exists())
+                dstFile.delete();
+              Files.move(srcFile.toPath(), dstFile.toPath());
+            } else {
+              System.err.println("Src file " + srcFile + " does not exist!");
+            }
           }
+          PluginCache.storeFiles(LaTeX.class, hash, results);
         }
       }
 
