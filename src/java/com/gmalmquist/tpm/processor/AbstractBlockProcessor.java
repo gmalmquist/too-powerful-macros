@@ -1,12 +1,11 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
-import java.lang.reflect.Method;
+import com.gmalmquist.tpm.model.ProcessingContext;
+
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
 
-public abstract class AbstractBlockProcessor implements AbstractFileProcessor {
+public abstract class AbstractBlockProcessor implements IProcessor {
 
   public static final List<AbstractBlockProcessor> BLOCK_PROCESSORS = new LinkedList<>();
 

@@ -1,17 +1,18 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor.listeners;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.antlr.v4.runtime.misc.Interval;
+import com.gmalmquist.tpm.antlr.ProcDefinitionsBaseListener;
+import com.gmalmquist.tpm.antlr.ProcDefinitionsParser;
+import com.gmalmquist.tpm.model.MacroDef;
+import com.gmalmquist.tpm.model.ProcessingContext;
+import com.gmalmquist.tpm.util.PathTools;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import gm.tpm.antlr.*;
 
 public class ProcessDefinitions extends ProcDefinitionsBaseListener {
 

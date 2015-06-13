@@ -1,4 +1,6 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
+
+import com.gmalmquist.tpm.model.ProcessingContext;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -6,7 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class PluginProcessor extends AbstractBlockProcessor{
+public class PluginProcessor extends AbstractBlockProcessor {
 
   private static PluginProcessor instance;
   public static PluginProcessor getInstance() {

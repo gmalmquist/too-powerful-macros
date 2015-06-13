@@ -1,16 +1,11 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor.listeners;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedList;
-
-import org.antlr.v4.runtime.misc.Interval;
+import com.gmalmquist.tpm.antlr.ProcIncludesBaseListener;
+import com.gmalmquist.tpm.FileLoader;
+import com.gmalmquist.tpm.antlr.ProcIncludesParser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import gm.tpm.antlr.*;
 
 public class FindIncludes extends ProcIncludesBaseListener {
 

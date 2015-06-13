@@ -1,12 +1,13 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
+import com.gmalmquist.tpm.antlr.ConstantRefsLexer;
+import com.gmalmquist.tpm.antlr.ConstantRefsParser;
+import com.gmalmquist.tpm.processor.listeners.ConstantSubstitution;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import gm.tpm.antlr.*;
-
-public class ConstantProcessor extends ParserFileProcessor<ConstantRefsLexer,ConstantRefsParser,ConstantSubstitution> {
+public class ConstantSubstitutionProcessor extends AbstractParserProcessor<ConstantRefsLexer,ConstantRefsParser,ConstantSubstitution> {
 
   public ConstantRefsLexer createLexer(CharStream input) {
     return new ConstantRefsLexer(input);

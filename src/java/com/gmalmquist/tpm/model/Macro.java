@@ -1,4 +1,4 @@
-package gm.tpm;
+package com.gmalmquist.tpm.model;
 
 import java.util.HashMap;
 import java.util.List;

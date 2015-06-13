@@ -1,4 +1,4 @@
-package gm.tpm;
+package com.gmalmquist.tpm.util;
 
 import java.io.File;
 import java.nio.file.Path;

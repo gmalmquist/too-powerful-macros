@@ -1,4 +1,4 @@
-package gm.tpm;
+package com.gmalmquist.tpm.model;
 
 import java.util.List;
 import java.util.LinkedList;
