@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 
-public abstract class AbstractBlockProcessor {
+public abstract class AbstractBlockProcessor implements AbstractFileProcessor {
 
   public static final List<AbstractBlockProcessor> BLOCK_PROCESSORS = new LinkedList<>();
 
@@ -73,5 +73,9 @@ public abstract class AbstractBlockProcessor {
   public abstract String processBlock(ProcessingContext context, String blockArgs, String blockData);
 
   public abstract void finish();
+
+  public String getName() {
+    return blockName.toLowerCase();
+  }
 
 }

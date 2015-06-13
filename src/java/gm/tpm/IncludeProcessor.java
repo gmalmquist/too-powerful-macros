@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import gm.tpm.antlr.*;
 
-public class IncludeProcessor extends Processor<ProcIncludesLexer,ProcIncludesParser,FindIncludes> {
+public class IncludeProcessor extends ParserFileProcessor<ProcIncludesLexer,ProcIncludesParser,FindIncludes> {
 
 
   public ProcIncludesLexer createLexer(CharStream input) {
@@ -23,6 +23,10 @@ public class IncludeProcessor extends Processor<ProcIncludesLexer,ProcIncludesPa
 
   public ParserRuleContext getRoot(ProcIncludesParser parser) {
     return parser.file();
+  }
+
+  public String getName() {
+    return "include";
   }
 
 }
