@@ -1,19 +1,8 @@
-package gm.tpm;
+package com.gmalmquist.tpm;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.Vocabulary;
+import com.gmalmquist.tpm.processor.IncludeProcessor;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.io.File;
-import java.io.IOException;
-
-import gm.tpm.antlr.*;
 
 public class FileLoader {
   

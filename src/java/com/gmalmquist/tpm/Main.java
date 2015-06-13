@@ -1,11 +1,8 @@
-package gm.tpm;
+package com.gmalmquist.tpm;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import com.gmalmquist.tpm.processor.AbstractBlockProcessor;
+import com.gmalmquist.tpm.util.CmdArg;
+import com.gmalmquist.tpm.util.PathTools;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -15,8 +12,6 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.io.File;
 import java.io.PrintStream;
-
-import gm.tpm.antlr.*;
 
 public class Main {
 

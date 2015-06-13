@@ -1,16 +1,17 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
 
+import com.gmalmquist.tpm.antlr.ProcMacroCallsLexer;
+import com.gmalmquist.tpm.model.MacroDef;
+import com.gmalmquist.tpm.model.ProcessingContext;
 import org.antlr.v4.runtime.*;
-
-import gm.tpm.antlr.*;
 
 import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class FastMacroCaller implements AbstractFileProcessor {
+public class MacroCallProcessor implements IProcessor {
 
   private CharStream getStream(String content) {
     try {

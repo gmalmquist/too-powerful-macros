@@ -1,5 +1,6 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
+import com.gmalmquist.tpm.model.ProcessingContext;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -11,13 +12,11 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-public abstract class ParserFileProcessor<X extends Lexer, P extends Parser, T extends ParseTreeListener> implements AbstractFileProcessor {
+public abstract class AbstractParserProcessor<X extends Lexer, P extends Parser, T extends ParseTreeListener> implements IProcessor {
 
   public abstract X createLexer(CharStream input);
 

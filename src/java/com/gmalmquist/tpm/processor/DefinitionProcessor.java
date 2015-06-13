@@ -1,12 +1,13 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
+import com.gmalmquist.tpm.antlr.ProcDefinitionsLexer;
+import com.gmalmquist.tpm.antlr.ProcDefinitionsParser;
+import com.gmalmquist.tpm.processor.listeners.ProcessDefinitions;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import gm.tpm.antlr.*;
-
-public class DefinitionsProcessor extends ParserFileProcessor<ProcDefinitionsLexer,ProcDefinitionsParser,ProcessDefinitions> {
+public class DefinitionProcessor extends AbstractParserProcessor<ProcDefinitionsLexer,ProcDefinitionsParser,ProcessDefinitions> {
 
   public ProcDefinitionsLexer createLexer(CharStream input) {
     return new ProcDefinitionsLexer(input);

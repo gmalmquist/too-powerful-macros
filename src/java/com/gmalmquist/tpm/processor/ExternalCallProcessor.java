@@ -1,4 +1,8 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
+
+import com.gmalmquist.tpm.Main;
+import com.gmalmquist.tpm.model.ProcessingContext;
+import com.gmalmquist.tpm.util.ExternalCache;
 
 import java.io.File;
 import java.io.InputStream;
@@ -7,16 +11,12 @@ import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
 
-public class ExternalProcessor extends AbstractBlockProcessor {
+public class ExternalCallProcessor extends AbstractBlockProcessor {
 
-  public ExternalProcessor() {
+  public ExternalCallProcessor() {
     super("external", true);
   }
 

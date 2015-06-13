@@ -1,4 +1,4 @@
-package gm.tpm.plugins;
+package com.gmalmquist.tpm.plugins;
 
 import java.io.File;
 import java.io.BufferedReader;

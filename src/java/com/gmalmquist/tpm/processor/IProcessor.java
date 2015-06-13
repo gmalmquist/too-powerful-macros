@@ -1,6 +1,8 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
-public interface AbstractFileProcessor {
+import com.gmalmquist.tpm.model.ProcessingContext;
+
+public interface IProcessor {
   /**
    * Process the given input file, and return the processed text.
    * @param context The processing context for this file.

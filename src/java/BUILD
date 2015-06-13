@@ -1,6 +1,6 @@
 jvm_binary(name='java',
   dependencies=[':lib', 'src/antlr'],
-  main='gm.tpm.Main',
+  main='com.gmalmquist.tpm.Main',
   basename='tpm',
 )
 

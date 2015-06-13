@@ -1,4 +1,4 @@
-package gm.tpm;
+package com.gmalmquist.tpm.util;
 
 public class CmdArg {
 

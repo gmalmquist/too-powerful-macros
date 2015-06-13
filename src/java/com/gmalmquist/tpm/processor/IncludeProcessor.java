@@ -1,12 +1,13 @@
-package gm.tpm;
+package com.gmalmquist.tpm.processor;
 
+import com.gmalmquist.tpm.antlr.ProcIncludesLexer;
+import com.gmalmquist.tpm.antlr.ProcIncludesParser;
+import com.gmalmquist.tpm.processor.listeners.FindIncludes;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import gm.tpm.antlr.*;
-
-public class IncludeProcessor extends ParserFileProcessor<ProcIncludesLexer,ProcIncludesParser,FindIncludes> {
+public class IncludeProcessor extends AbstractParserProcessor<ProcIncludesLexer,ProcIncludesParser,FindIncludes> {
 
 
   public ProcIncludesLexer createLexer(CharStream input) {

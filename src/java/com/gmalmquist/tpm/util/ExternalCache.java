@@ -1,4 +1,6 @@
-package gm.tpm;
+package com.gmalmquist.tpm.util;
+
+import com.gmalmquist.tpm.Main;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,21 +1,13 @@
-package gm.tpm;
+package com.gmalmquist.tpm;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import com.gmalmquist.tpm.model.ProcessingContext;
+import com.gmalmquist.tpm.processor.*;
 
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-
-import gm.tpm.antlr.*;
 
 public class FileProcessor {
 
@@ -50,39 +42,39 @@ public class FileProcessor {
       System.err.println("\tdstFile: " + dstFile + " (exists? " + dstFile.exists() + ")");
     }
 
-    List<AbstractFileProcessor> preprocessors = new LinkedList<>();
-    List<AbstractFileProcessor> midprocessors = new LinkedList<>();
-    List<AbstractFileProcessor> endprocessors = new LinkedList<>();
+    List<IProcessor> preprocessors = new LinkedList<>();
+    List<IProcessor> midprocessors = new LinkedList<>();
+    List<IProcessor> endprocessors = new LinkedList<>();
 
-    preprocessors.add(new DefinitionsProcessor());
+    preprocessors.add(new DefinitionProcessor());
 
-    midprocessors.add(new FastMacroCaller());
-    midprocessors.add(new ConstantProcessor());
+    midprocessors.add(new MacroCallProcessor());
+    midprocessors.add(new ConstantSubstitutionProcessor());
 
-    endprocessors.add(new ExternalProcessor());
+    endprocessors.add(new ExternalCallProcessor());
     endprocessors.add(PluginProcessor.getInstance());
 
     String content = FileLoader.getFileContent(path);
-    for (AbstractFileProcessor afp : preprocessors) {
+    for (IProcessor afp : preprocessors) {
       content = runMaybe(afp, context, content);
     }
 
     context.thingsChanged = true;
     for (int i = 0; context.thingsChanged && i < 10; i++) {
       context.thingsChanged = false;
-      for (AbstractFileProcessor afp : midprocessors) {
+      for (IProcessor afp : midprocessors) {
         content = runMaybe(afp, context, content);
       }
     }
 
-    for (AbstractFileProcessor afp : endprocessors) {
+    for (IProcessor afp : endprocessors) {
       content = runMaybe(afp, context, content);
     }
 
     return content;
   }
 
-  private static String runMaybe(AbstractFileProcessor afp, ProcessingContext context, String content) {
+  private static String runMaybe(IProcessor afp, ProcessingContext context, String content) {
     if (Main.SKIP.contains(afp.getName()) || Main.SKIP.contains(afp.getName()+"s"))
       return content;
     return afp.processFile(context, content);
