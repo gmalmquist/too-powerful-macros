@@ -12,6 +12,8 @@ import java.security.MessageDigest;
 
 public class PluginCache {
 
+  public static int MAX_FILENAME_LENGTH = 250;
+
   public static String sha1(String text) {
     MessageDigest digest = null;
     try {
@@ -23,7 +25,30 @@ public class PluginCache {
     byte[] data = digest.digest(text.getBytes());
     StringBuffer sb = new StringBuffer(data.length);
     for (int i = 0; i < data.length; i++) {
-      sb.append(Integer.toString((data[i] * 0x0FF) + 0x100, 16).substring(1));
+      String hexed = Integer.toString((data[i] & 0x0FF), 16);
+      for (int j = 0; j < 2-hexed.length(); j++) {
+        sb.append("0");
+      }
+      sb.append(hexed.substring(Math.max(0,hexed.length()-2), hexed.length()));
+    }
+    return sb.toString();
+  }
+
+  public static String dataToHexPath(String code) {
+    StringBuffer sb = new StringBuffer(code.length()*3);
+    int nameLength = 0;
+    for (int i = 0; i < code.length(); i++, nameLength += 2) {
+      char c = code.charAt(i);
+      String hex = Integer.toHexString(c & 0x0FF);
+      if (nameLength+2 > MAX_FILENAME_LENGTH) {
+        sb.append(File.separator);
+      }
+      for (int j = 0; j < 2-hex.length(); j++) {
+        sb.append("0");
+      }
+      for (int j = 0; j < 2 && j < hex.length(); j++) {
+        sb.append(hex.charAt(j));
+      }
     }
     return sb.toString();
   }
@@ -38,12 +63,15 @@ public class PluginCache {
   }
 
   public static String getPath(Class<?> clazz, String name) {
+    name = sha1(name);
     StringBuffer sb = new StringBuffer(128);
+    sb.append(System.getProperty("user.home"));
+    sb.append(File.separator);
     sb.append(".tpm-plugin-cache");
     sb.append(File.separator);
     sb.append(clazz.getName());
     sb.append(File.separator);
-    sb.append(name);
+    sb.append(dataToHexPath(name));
     return sb.toString();
   }
 

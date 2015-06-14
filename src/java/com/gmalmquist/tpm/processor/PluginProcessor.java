@@ -40,7 +40,7 @@ public class PluginProcessor extends AbstractBlockProcessor {
 
     try {
       ClassLoader classLoader = this.getClass().getClassLoader();
-      final Class<?> pluginClass = classLoader.loadClass("gm.tpm.plugins." + name);
+      final Class<?> pluginClass = classLoader.loadClass("com.gmalmquist.tpm.plugins." + name);
 
       Object plugin = null;
       if (plugins.containsKey(name)) {
@@ -69,6 +69,7 @@ public class PluginProcessor extends AbstractBlockProcessor {
       return result;
     } catch (Exception ex) {
       System.err.println(ex);
+      ex.printStackTrace(System.err);
       return String.valueOf(ex);
     }
   }

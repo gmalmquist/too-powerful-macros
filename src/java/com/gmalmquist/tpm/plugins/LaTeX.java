@@ -5,8 +5,10 @@ import java.io.InputStreamReader;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class LaTeX {
 
@@ -14,8 +16,8 @@ public class LaTeX {
 
   private List<String> codes = new LinkedList<String>();
   private List<String> folders = new LinkedList<String>();
+  private Map<String, String> filenameMap = new HashMap<>();
 
-  private int latexIndex = 0;
   private int imageIndex = 0;
 
   private String density = "120";
@@ -43,12 +45,36 @@ public class LaTeX {
       density = args;
     }
 
-    codes.add(data);
-    folders.add(new File(dstFile).getParentFile().toString() + File.separator + "img");
-    if (codes.size() > QUEUE_SIZE) {
-      finish();
+    String folder = new File(dstFile).getParentFile().toString() + File.separator + "img";
+    String filename = "LaTeX-image-" + (++imageIndex) + ".png";
+    filenameMap.put(data, filename);
+
+    File cachedFile = getCachedFile(data);
+    if (cachedFile == null) {
+      codes.add(data);
+      folders.add(new File(dstFile).getParentFile().toString() + File.separator + "img");
+      if (codes.size() > QUEUE_SIZE) {
+        finish();
+      }
+    } else {
+      if (!new File(folder).exists()) {
+        new File(folder).mkdirs();
+      }
+      PluginCache.copy(cachedFile, new File(folder + File.separator + filename));
     }
-    return "<img src=\"img/" + ("LaTeX-image-" + (++imageIndex) + ".png") + "\"></img>";
+    return "<img src=\"img/" + filename + "\"></img>";
+  }
+
+  private File getCachedFile(String code) {
+    File[] files = PluginCache.getFiles(LaTeX.class, density+":" + code);
+    if (files == null || files.length == 0) {
+      return null;
+    }
+    return files[0];
+  }
+
+  private void storeCachedFile(String code, File src) {
+    PluginCache.storeFiles(LaTeX.class, density+":" + code, src);
   }
 
   private boolean readStream(final Process process) {
@@ -105,12 +131,19 @@ public class LaTeX {
       List<String> preamble = new LinkedList<>();
       String ptag = "%PREAMBLE ";
       String nltag = "%NL";
+      String[] originalCodes = new String[codes.size()];
       for (int ci = 0; ci < codes.size(); ci++) {
         String code = codes.get(ci);
+        originalCodes[ci] = code; // for caching.
         String[] lines = code.split("\n");
         boolean any = false;
         for (int i = 0; i < lines.length; i++) {
           String line = lines[i].trim();
+          if (line.length() == 0) {
+            lines[i] = null;
+            any = true;
+            continue;
+          }
           if (line.startsWith(ptag)) {
             line = line.substring(ptag.length()).trim();
             if (!preamble.contains(line)) {
@@ -118,7 +151,7 @@ public class LaTeX {
               lines[i] = null;
               any = true;
             }
-          } else if (line.equals("%NL")) {
+          } else if (line.equals(nltag)) {
             lines[i] = "";
             any = true;
           }
@@ -146,79 +179,50 @@ public class LaTeX {
         sb.append(code+"\n");
       }
 
-      // Just for cache invalidation.
-      sb.append("\n% ");
-      sb.append(density);
-      sb.append(":");
-      sb.append(imageIndex);
-      sb.append(":");
-      sb.append(latexIndex);
-      sb.append("\n");
-
       sb.append("\\end{document}"+"\n");
 
       PrintStream out = new PrintStream(texfile);
       out.print(sb.toString());
       out.close();
 
-      String hash = PluginCache.sha1(sb.toString());
-      if (PluginCache.hasEntry(LaTeX.class, hash)) {
-        log("loading latex images from cache ...");
-        File[] files = PluginCache.getFiles(LaTeX.class, hash);
-        if (files.length != folders.size()) {
-          log("Requested " + folders.size() + ", got " + files.length + ".");
-        }
-        int ci = 0;
+      log("pdflatex (" + codes.size() + " images)");
+      Process pdflatex = Runtime.getRuntime().exec(new String[] {
+        "pdflatex", texfile.getName(),
+      });
+      if (readStream(pdflatex)) {
+        log("pdfcrop");
+        Runtime.getRuntime().exec(new String[] {
+          "pdfcrop", texname + ".pdf",
+        }).waitFor();
+
+        log("convert (density=" + density + ")");
+        Runtime.getRuntime().exec(new String[] {
+          "convert", "-density", density, texname + "-crop.pdf", "-quality", "90", texname + ".png"
+        }).waitFor();
+
+        File[] results = new File[folders.size()];
+        log("moving output images");
+        int index = -1;
         for (String folder : folders) {
-          latexIndex++;
-          File dst = new File(folder + File.separator + "LaTeX-image-" + latexIndex + ".png");
-          log("  " + dst.getName());
-          if (!dst.getParentFile().exists()) {
-            dst.getParentFile().mkdirs();
+          index++;
+          String srcPath = String.format("%s%s.png", texname, folders.size() > 1 ? "-" + index : "");
+          String dstPath = folder + File.separator + filenameMap.get(originalCodes[index]);
+          File srcFile = new File(srcPath);
+          File dstFile = new File(dstPath);
+          results[index] = dstFile;
+
+          if (!dstFile.getParentFile().exists()) {
+            dstFile.getParentFile().mkdirs();
           }
-          PluginCache.copy(files[ci++], dst);
-        }
-      } else {
-        log("pdflatex (" + codes.size() + " images)");
-        Process pdflatex = Runtime.getRuntime().exec(new String[] {
-          "pdflatex", texfile.getName(),
-        });
-        if (readStream(pdflatex)) {
-          log("pdfcrop");
-          Runtime.getRuntime().exec(new String[] {
-            "pdfcrop", texname + ".pdf",
-          }).waitFor();
 
-          log("convert (density=" + density + ")");
-          Runtime.getRuntime().exec(new String[] {
-            "convert", "-density", density, texname + "-crop.pdf", "-quality", "90", texname + ".png"
-          }).waitFor();
-
-          File[] results = new File[folders.size()];
-          log("moving output images");
-          int index = -1;
-          for (String folder : folders) {
-            index++;
-            latexIndex++;
-            String srcPath = String.format("%s%s.png", texname, folders.size() > 1 ? "-" + index : "");
-            String dstPath = folder + File.separator + "LaTeX-image-" + latexIndex + ".png";
-            File srcFile = new File(srcPath);
-            File dstFile = new File(dstPath);
-            results[index] = dstFile;
-
-            if (!dstFile.getParentFile().exists()) {
-              dstFile.getParentFile().mkdirs();
-            }
-
-            if (srcFile.exists()) {
-              if (dstFile.exists())
-                dstFile.delete();
-              Files.move(srcFile.toPath(), dstFile.toPath());
-            } else {
-              System.err.println("Src file " + srcFile + " does not exist!");
-            }
+          if (srcFile.exists()) {
+            if (dstFile.exists())
+              dstFile.delete();
+            Files.move(srcFile.toPath(), dstFile.toPath());
+            storeCachedFile(originalCodes[index], dstFile);
+          } else {
+            System.err.println("Src file " + srcFile + " does not exist!");
           }
-          PluginCache.storeFiles(LaTeX.class, hash, results);
         }
       }
 
