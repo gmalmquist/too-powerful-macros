@@ -23,14 +23,15 @@ public class MacroCallProcessor implements IProcessor {
 
   public String processFile(ProcessingContext context, String content) {
     StringBuffer results = new StringBuffer(content.length());
-
     ProcMacroCallsLexer lexer = new ProcMacroCallsLexer(getStream(content));
-
     Pattern macroCallPattern = Pattern.compile("^[a-zA-Z0-9_$]+[(]$");
-
     LinkedList<Closable> macroStack = new LinkedList<>();
+
+    String lastToken = null;
     for (Token token : lexer.getAllTokens()) {
       String text = token.getText();
+      String last = lastToken;
+      lastToken = text;
       if (macroCallPattern.matcher(text).matches()) {
         String name = text.substring(0, text.length()-1);
         if (context.macros.containsKey(name)) {
@@ -40,7 +41,8 @@ public class MacroCallProcessor implements IProcessor {
       }
       if (!macroStack.isEmpty()) {
         if (text.equals("(")) {
-          macroStack.push(new ParentheticalClosable());
+          macroStack.push(new ParentheticalClosable(lastToken == null
+                  || (!lastToken.endsWith("(") && !lastToken.endsWith(","))));
           continue;
         }
 
@@ -65,11 +67,16 @@ public class MacroCallProcessor implements IProcessor {
     return "macro";
   }
 
+  /**
+   * Represents a grouping entity (such as a macro or parenthetical) which
+   * wraps around other text.
+   */
   interface Closable {
     /** Consumes the token, returning true if we're ready to close. */
-    public boolean consume(String token);
+    boolean consume(String token);
 
-    public String getText();
+    /** Formatted text of the data this closable has consumed. */
+    String getText();
   }
 
   class MacroClosable implements Closable {
@@ -107,14 +114,20 @@ public class MacroCallProcessor implements IProcessor {
 
   class ParentheticalClosable implements Closable {
     private StringBuffer contents;
+    private boolean inclusive;
 
-    ParentheticalClosable() {
+    ParentheticalClosable(boolean inclusive) {
       this.contents = new StringBuffer(64);
-      contents.append("(");
+      this.inclusive = inclusive;
+      if (inclusive) {
+        contents.append("(");
+      }
     }
 
     public boolean consume(String token) {
-      contents.append(token);
+      if (!token.equals(")") || inclusive) {
+        contents.append(token);
+      }
 
       if (token.equals(")")) {
         return true;

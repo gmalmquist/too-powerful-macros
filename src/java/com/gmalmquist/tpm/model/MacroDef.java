@@ -27,9 +27,21 @@ public class MacroDef {
   public String getBody() { return body; }
 
   public String apply(String[] args) {
+    String[] reArgs = new String[getArgs().length];
+    for (int i = 0; i < reArgs.length && i < args.length; i++) reArgs[i] = args[i];
+    for (int i = args.length; i < reArgs.length; i++) reArgs[i] = "";
+    if (reArgs.length < args.length) {
+      StringBuffer fillLast = new StringBuffer(reArgs[reArgs.length - 1]);
+      for (int i = reArgs.length; i < args.length; i++) {
+        fillLast.append(",");
+        fillLast.append(args[i]);
+      }
+      reArgs[reArgs.length-1] = fillLast.toString();
+    }
+
     StringBuffer sb = new StringBuffer(tokens.size()*4);
     for (Token t : tokens) {
-      sb.append(t.toString(args));
+      sb.append(t.toString(reArgs));
     }
     return sb.toString();
   }
